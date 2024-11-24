@@ -2,7 +2,7 @@
 
 ## Happiness Score Prediction
 
-This repository contains a machine learning project focused on predicting happiness scores using the [2019 World Happiness Report dataset from Kaggle](https://www.kaggle.com/datasets/unsdsn/world-happiness/data). The project explores data preprocessing, model evaluation, and a comparison of regression techniques, including Linear Regression and Random Forest Regressor.
+This repository contains a machine learning project focused on predicting happiness scores using the [2019 World Happiness Report dataset from Kaggle](https://www.kaggle.com/datasets/unsdsn/world-happiness/data). The project explores data preprocessing, model evaluation, and a comparison of regression techniques, including Linear Regression, Random Forest Regressor and XGBoost.
 
 ### Dataset
 
@@ -26,5 +26,15 @@ Clone the repository via git clone and install the required Python libraries via
 pip install -r requirements.txt
 ```
 
-### Insights
-Random Forest performs better overall with the cross-validation mean score (𝑅^2 = 0.7842) being the highest score.
+### Results
+
+| Metric                      | Linear Regression | Random Forest | XGBoost  |
+|-----------------------------|-------------------|---------------|----------|
+| Training Score (without CV) | 1.000000          | 0.972398      | 0.999999 |
+| Testing Score (without CV)  | 0.601909          | 0.648493      | 0.650734 |
+| Training Score (with CV)    | 1.000000          | 0.972398      | 0.999999 |
+| Testing Score (with CV)     | 0.755904          | 0.784200      | 0.794331 |
+
+#### Conclusion
+- XGBoost was the best-performing model in this context with and without cross validation.
+- Linear Regression was the lest effective model for this dataset most likely because it assumes a linear relationship which does not capture complex dynamics.
