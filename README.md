@@ -18,5 +18,13 @@ Key features in the dataset include:
 - Target Variable: Score — The happiness score of a country.
 - Dropped Feature: Overall Rank.
 
+### Installation
+
+Clone the repository via git clone and install the required Python libraries via:
+
+```
+pip install -r requirements.txt
+```
+
 ### Insights
 Random Forest performs better overall with the cross-validation mean score (𝑅^2 = 0.7842) being the highest score.
