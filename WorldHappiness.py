@@ -41,58 +41,72 @@ linear_reg_pipeline = Pipeline(
 
 cv_folds = 6
 
-# Before Cross-Validation
-# Train the pipeline on the training set
 linear_reg_pipeline.fit(X_train, y_train)
 
-# Compute training and testing scores (before CV)
+# Training and testing scores without cross-validation
 train_score_before = linear_reg_pipeline.score(X_train, y_train)
 test_score_before = linear_reg_pipeline.score(X_test, y_test)
 
-print("Before Cross-Validation:")
-print("Training Score (R^2):", train_score_before)
-print("Testing Score (R^2):", test_score_before)
 
-# Perform cross-validation on the training set
+# Perform cross-validation for Linear Regression
 cv_scores = cross_val_score(
     estimator=linear_reg_pipeline,
     X=X_train,
     y=y_train,
     cv=cv_folds,  # 5-fold cross-validation
-    scoring="r2",  # Use R^2 score
+    scoring="r2"
 )
 
-# Compute the mean cross-validation score (as "test score after CV")
+# Mean cross-validation score
 mean_cv_score = np.mean(cv_scores)
 
-# Refit the pipeline on the entire training set to calculate training score
-linear_reg_pipeline.fit(X_train, y_train)
+# Training score after cross-validation
 train_score_after = linear_reg_pipeline.score(X_train, y_train)
 
-print("\nAfter Cross-Validation:")
-print("Training Score (R^2):", train_score_after)
-print("Mean Cross-Validation Testing Score (R^2):", mean_cv_score)
 
-print("-----------------------------------------")
-
+# Random Forest Pipeline
 rf_pipeline = Pipeline([
-    ("preprocessor", preprocessor),  # Reuse the same preprocessor as linear regression
+    ("preprocessor", preprocessor),
     ("regressor", RandomForestRegressor(n_estimators=100, random_state=42))
 ])
 
 # Train the Random Forest model
 rf_pipeline.fit(X_train, y_train)
 
-# Compute training and testing scores for Random Forest
+# Training and testing scores for Random Forest
 rf_train_score = rf_pipeline.score(X_train, y_train)
 rf_test_score = rf_pipeline.score(X_test, y_test)
 
-print("\nRandom Forest Performance:")
-print("Training Score (R^2):", rf_train_score)
-print("Testing Score (R^2):", rf_test_score)
-
-# Cross-validation for Random Forest
+# Perform cross-validation for Random Forest
 rf_cv_scores = cross_val_score(rf_pipeline, X_train, y_train, cv=cv_folds, scoring="r2")
 rf_mean_cv_score = np.mean(rf_cv_scores)
 
-print("\nRandom Forest Cross-Validation Mean Score (R^2):", rf_mean_cv_score)
+
+# Output results in a table format
+results = {
+    "Metric": [
+        "Training Score (without CV)",
+        "Testing Score (without CV)",
+        "Training Score (with CV)",
+        "Testing Score (with CV)"
+    ],
+    "Linear Regression": [
+        train_score_before,  # Training score without cross-validation
+        test_score_before,   # Testing score without cross-validation
+        train_score_after,    # Training score with cross-validation
+        mean_cv_score         # Testing score with cross-validation
+    ],
+    "Random Forest": [
+        rf_train_score,       # Training score without cross-validation
+        rf_test_score,        # Testing score without cross-validation
+        rf_pipeline.score(X_train, y_train),  # Refit Random Forest for training with CV
+        rf_mean_cv_score       # Testing score with cross-validation
+    ]
+}
+
+# Create DataFrame for results
+results_df = pd.DataFrame(results)
+
+# Print the results table
+print("\nModel Performance:")
+print(results_df)
