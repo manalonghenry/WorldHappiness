@@ -1,0 +1,30 @@
+catboost==1.2.7
+certifi @ file:///home/conda/feedstock_root/build_artifacts/certifi_1725278078093/work/certifi
+contourpy @ file:///D:/bld/contourpy_1731428338157/work
+cycler @ file:///home/conda/feedstock_root/build_artifacts/cycler_1696677705766/work
+fonttools @ file:///D:/bld/fonttools_1731643410328/work
+graphviz==0.20.3
+joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1714665484399/work
+kiwisolver @ file:///D:/bld/kiwisolver_1725459382062/work
+lightgbm @ file:///home/conda/feedstock_root/build_artifacts/liblightgbm_1728547591057/work
+matplotlib==3.9.2
+munkres==1.1.4
+numpy==1.26.4
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1731802491770/work
+pandas @ file:///D:/bld/pandas_1726878561601/work
+pillow @ file:///D:/bld/pillow_1726075253811/work
+plotly==5.24.1
+pyparsing @ file:///home/conda/feedstock_root/build_artifacts/pyparsing_1728880423364/work
+PySide6==6.8.0.2
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1731919281354/work
+pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1706886791323/work
+scikit-learn @ file:///D:/bld/scikit-learn_1726082855864/work/dist/scikit_learn-1.5.2-cp310-cp310-win_amd64.whl#sha256=f8a2b0c9a97f54c5c064931b1b27e9443957ccd063bc8c437288596a61b2bd5d
+scipy @ file:///C:/bld/scipy-split_1729480777186/work/dist/scipy-1.14.1-cp310-cp310-win_amd64.whl#sha256=0bd1a786f4784f64d7038cb496e376c7aee37fd463d42853dbee10be0eb97a75
+shiboken6==6.8.0.2
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
+tenacity==9.0.0
+threadpoolctl @ file:///home/conda/feedstock_root/build_artifacts/threadpoolctl_1714400101435/work
+tornado @ file:///D:/bld/tornado_1724956183921/work
+tzdata @ file:///home/conda/feedstock_root/build_artifacts/python-tzdata_1727140567071/work
+unicodedata2 @ file:///D:/bld/unicodedata2_1729704580516/work
+xgboost==2.1.2
