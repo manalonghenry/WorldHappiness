@@ -1,34 +1,34 @@
 from sklearn.compose import ColumnTransformer
+from sklearn.dummy import DummyRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-import pandas as pd
-from sklearn.model_selection import cross_val_score
-import numpy as np
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import GradientBoostingRegressor
 from xgboost import XGBRegressor
+import pandas as pd
+import numpy as np
 
-#Load
+# Load the dataset
 happiness_df = pd.read_csv("WorldHappiness/2019.csv")
 
+# Define the target and features
 drop_features = ["Overall rank"]
 target_column = "Score"
 
-#Train-test split
+# Split the data into training and testing sets
 train_df, test_df = train_test_split(happiness_df, test_size=0.2, random_state=42)
 X_train = train_df.drop(columns=drop_features + [target_column])
 y_train = train_df[target_column]
 X_test = test_df.drop(columns=drop_features + [target_column])
 y_test = test_df[target_column]
 
-#Split features
+# Identify numerical and categorical features
 numerical_features = X_train.select_dtypes(include=["float64", "int64"]).columns
 categorical_features = X_train.select_dtypes(include=["object"]).columns
 
-#Preprocessor
+# Define the preprocessor
 preprocessor = ColumnTransformer(
     transformers=[
         ("num", StandardScaler(), numerical_features),
@@ -36,77 +36,69 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-#Linear Regression pipeline
+# Initialize models
+dummy_pipeline = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        ("regressor", DummyRegressor(strategy="mean")),  # Using DummyRegressor
+    ]
+)
+
 linear_reg_pipeline = Pipeline(
-    steps=[("preprocessor", preprocessor), ("regressor", LinearRegression())]
+    steps=[
+        ("preprocessor", preprocessor),
+        ("regressor", LinearRegression()),
+    ]
 )
 
-#Random Forest pipeline
 rf_pipeline = Pipeline(
-    steps=[("preprocessor", preprocessor), ("regressor", RandomForestRegressor(n_estimators=100, random_state=42))]
+    steps=[
+        ("preprocessor", preprocessor),
+        ("regressor", RandomForestRegressor(n_estimators=100, random_state=42)),
+    ]
 )
 
-#XGBoost pipeline
 xgb_pipeline = Pipeline(
-    steps=[("preprocessor", preprocessor), ("regressor", XGBRegressor(n_estimators=100, random_state=42))]
+    steps=[
+        ("preprocessor", preprocessor),
+        ("regressor", XGBRegressor(n_estimators=100, random_state=42)),
+    ]
 )
 
-#Cross-validation folds
+# Evaluate models
 cv_folds = 6
 
-#Train then score Linear Regression
-linear_reg_pipeline.fit(X_train, y_train)
-train_score_before = linear_reg_pipeline.score(X_train, y_train)
-test_score_before = linear_reg_pipeline.score(X_test, y_test)
-cv_scores_lr = cross_val_score(linear_reg_pipeline, X_train, y_train, cv=cv_folds, scoring="r2")
-mean_cv_score_lr = np.mean(cv_scores_lr)
-train_score_after_lr = linear_reg_pipeline.score(X_train, y_train)
+def evaluate_pipeline(pipeline, name):
+    # Train the pipeline
+    pipeline.fit(X_train, y_train)
 
-#Train then score Random Forest
-rf_pipeline.fit(X_train, y_train)
-rf_train_score = rf_pipeline.score(X_train, y_train)
-rf_test_score = rf_pipeline.score(X_test, y_test)
-cv_scores_rf = cross_val_score(rf_pipeline, X_train, y_train, cv=cv_folds, scoring="r2")
-rf_mean_cv_score = np.mean(cv_scores_rf)
+    # Scores without cross-validation
+    train_score = pipeline.score(X_train, y_train)
+    test_score = pipeline.score(X_test, y_test)
 
-#Train then score XGBoost
-xgb_pipeline.fit(X_train, y_train)
-xgb_train_score = xgb_pipeline.score(X_train, y_train)
-xgb_test_score = xgb_pipeline.score(X_test, y_test)
-cv_scores_xgb = cross_val_score(xgb_pipeline, X_train, y_train, cv=cv_folds, scoring="r2")
-xgb_mean_cv_score = np.mean(cv_scores_xgb)
+    # Cross-validation score
+    cv_scores = cross_val_score(pipeline, X_train, y_train, cv=cv_folds, scoring="r2")
+    mean_cv_score = np.mean(cv_scores)
 
-#Output results
-results = {
-    "Metric": [
-        "Training Score (without CV)",
-        "Testing Score (without CV)",
-        "Training Score (with CV)",
-        "Testing Score (with CV)"
-    ],
-    "Linear Regression": [
-        train_score_before,  # Training score without cross-validation
-        test_score_before,   # Testing score without cross-validation
-        train_score_after_lr,    # Training score with cross-validation
-        mean_cv_score_lr         # Testing score with cross-validation
-    ],
-    "Random Forest": [
-        rf_train_score,       # Training score without cross-validation
-        rf_test_score,        # Testing score without cross-validation
-        rf_pipeline.score(X_train, y_train),  # Refit Random Forest for training with CV
-        rf_mean_cv_score       # Testing score with cross-validation
-    ],
-    "XGBoost": [
-        xgb_train_score,      # Training score without cross-validation
-        xgb_test_score,       # Testing score without cross-validation
-        xgb_pipeline.score(X_train, y_train),  # Refit XGBoost for training with CV
-        xgb_mean_cv_score     # Testing score with cross-validation
-    ]
-}
+    return {
+        "Model": name,
+        "Training Score (without CV)": train_score,
+        "Testing Score (without CV)": test_score,
+        "Mean Training Score (with CV)": pipeline.score(X_train, y_train),
+        "Mean Testing Score (with CV)": mean_cv_score,
+    }
 
-# Create DataFrame for results
+# Collect results for all models
+results = []
+results.append(evaluate_pipeline(dummy_pipeline, "Dummy Regressor"))
+results.append(evaluate_pipeline(linear_reg_pipeline, "Linear Regression"))
+results.append(evaluate_pipeline(rf_pipeline, "Random Forest"))
+results.append(evaluate_pipeline(xgb_pipeline, "XGBoost"))
+
+# Convert results to DataFrame for display
 results_df = pd.DataFrame(results)
 
-#Print results
-print("\nModel Performance:")
+# Print results
+print("\nModel Performance Comparison:")
 print(results_df)
+
