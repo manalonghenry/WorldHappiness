@@ -37,4 +37,4 @@ pip install -r requirements.txt
 
 #### Conclusion
 - XGBoost was the best-performing model in this context with and without cross validation.
-- Linear Regression was the lest effective model for this dataset most likely because it assumes a linear relationship which does not capture complex dynamics.
+- Linear Regression was the least effective model for this dataset most likely because it assumes a linear relationship which does not capture complex dynamics.
